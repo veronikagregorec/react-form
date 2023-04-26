@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import { db } from "./firebase-config";
 import { collection, getDocs, addDoc } from "firebase/firestore";
-import TableRows from "./TableRows";
+import Row from "./Row";
 
 function App() {
   const [newName, setNewName] = useState("");
@@ -17,73 +17,83 @@ function App() {
       email: newEmail,
       sname: newSname,
     });
+  };
 
-    window.location.reload(true);
+  const getUsers = async () => {
+    const data = await getDocs(usersCollectionRef);
+    setUsers(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
   };
 
   useEffect(() => {
-    const getUsers = async () => {
-      const data = await getDocs(usersCollectionRef);
-      setUsers(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-    };
-
     getUsers();
-  }, []);
+  }, [getUsers]);
 
   return (
-    <div className="App">
-      <div className="flex-container">
-        <input
-          type="text"
-          className="ime"
-          placeholder="Ime"
-          onChange={(event) => {
-            setNewName(event.target.value);
-          }}
-        />
-        <input
-          type="text"
-          className="priimek"
-          placeholder="Priimek"
-          onChange={(event) => {
-            setNewSname(event.target.value);
-          }}
-        />
-        <input
-          type="text"
-          className="mejl"
-          placeholder="E-mail"
-          onChange={(event) => {
-            setNewEmail(event.target.value);
-          }}
-        />
+    <div>
+      <div className="App">
+        <div className="flex-container">
+          <input
+            type="text"
+            className="ime"
+            placeholder="Your firstname"
+            onChange={(event) => {
+              setNewName(event.target.value);
+            }}
+            onKeyPress={(event) => {
+              if (!/[A-Za-z]/.test(event.key)) {
+                event.preventDefault();
+              }
+            }}
+          />
+          <input
+            type="text"
+            className="priimek"
+            placeholder="Your lastname"
+            onChange={(event) => {
+              setNewSname(event.target.value);
+            }}
+            onKeyPress={(event) => {
+              if (!/[A-Za-z]/.test(event.key)) {
+                event.preventDefault();
+              }
+            }}
+          />
+          <input
+            type="text"
+            className="mejl"
+            placeholder="Your e-mail"
+            onChange={(event) => {
+              setNewEmail(event.target.value);
+            }}
+          />
 
-        <button className="gumb" onClick={sendUser}>
-          Pošlji
-        </button>
-      </div>
+          <button className="gumb" onClick={sendUser}>
+            Send
+          </button>
+        </div>
 
-      <div className="wrap">
-        <table className="flex-table">
-          <thead>
-            <tr>
-              <th>Ime </th>
-              <th>Priimek</th>
-              <th>E-mail</th>
-            </tr>
-          </thead>
-        </table>
-        {users.map((users) => {
-          return (
-            <div>
-              <table className="flex-table">
-                <tbody>
-                  <TableRows users={users} />
-                </tbody>
-              </table>
-            </div>
-          );
-        })}
+        <div className="wrap">
+          <table className="flex-table">
+            <thead>
+              <tr>
+                <th>Firstname</th>
+                <th>Lastname</th>
+                <th>E-mail</th>
+              </tr>
+            </thead>
+          </table>
+          {users.map((users) => {
+            return (
+              <div>
+                <table className="flex-table">
+                  <tbody>
+                    <Row users={users} />
+                  </tbody>
+                </table>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
