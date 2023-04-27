@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./App.css";
 import { db } from "./firebase-config";
 import { collection, getDocs, addDoc } from "firebase/firestore";
@@ -11,12 +11,20 @@ function App() {
   const [users, setUsers] = useState([]);
   const usersCollectionRef = collection(db, "users");
 
+  const firstRef = useRef(null);
+  const lastRef = useRef(null);
+  const emailRef = useRef(null);
+
   const sendUser = async () => {
     await addDoc(usersCollectionRef, {
       name: newName,
       email: newEmail,
       sname: newSname,
     });
+
+    firstRef.current.value = "";
+    lastRef.current.value = "";
+    emailRef.current.value = "";
   };
 
   const getUsers = async () => {
@@ -33,6 +41,7 @@ function App() {
       <div className="App">
         <div className="flex-container">
           <input
+            ref={firstRef}
             type="text"
             className="ime"
             placeholder="Your firstname"
@@ -46,6 +55,7 @@ function App() {
             }}
           />
           <input
+            ref={lastRef}
             type="text"
             className="priimek"
             placeholder="Your lastname"
@@ -59,6 +69,7 @@ function App() {
             }}
           />
           <input
+            ref={emailRef}
             type="text"
             className="mejl"
             placeholder="Your e-mail"
